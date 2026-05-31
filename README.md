@@ -1,3 +1,9 @@
+## Changes
+
+* Mac compatible LocateAnything
+
+## Original Readme
+
 <div align="center">
 
 #  🦅  Eagle: Frontier Vision-Language Models with Data-Centric Strategies
