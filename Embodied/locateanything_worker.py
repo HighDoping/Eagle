@@ -9,27 +9,38 @@
 """
 locateanything_worker.py - A reusable worker for LocateAnything inference.
 """
+import os
 import re
 
+os.environ["TRITON_CPU_BACKEND"] = "1"
 import torch
 from PIL import Image
-from transformers import AutoModel, AutoTokenizer, AutoProcessor
+from transformers import AutoModel, AutoProcessor, AutoTokenizer
 
+device = (
+    "cuda"
+    if torch.cuda.is_available()
+    else "mps" if torch.backends.mps.is_available() else "cpu"
+)
 
 class LocateAnythingWorker:
     """Stateful worker that loads the model once and serves perception queries."""
 
-    def __init__(self, model_path: str, device: str = "cuda", dtype=torch.bfloat16):
+    def __init__(self, model_path: str, device: str = device, dtype=torch.bfloat16):
         self.device = device
         self.dtype = dtype
 
         self.tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
         self.processor = AutoProcessor.from_pretrained(model_path, trust_remote_code=True)
-        self.model = AutoModel.from_pretrained(
-            model_path,
-            torch_dtype=dtype,
-            trust_remote_code=True,
-        ).to(device).eval()
+        self.model = (
+            AutoModel.from_pretrained(
+                model_path,
+                dtype=dtype,
+                trust_remote_code=True,
+            )
+            .to(device)
+            .eval()
+        )
 
     @torch.no_grad()
     def predict(

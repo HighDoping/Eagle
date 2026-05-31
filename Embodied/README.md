@@ -1,3 +1,25 @@
+## Changes
+
+* Use Mac compatible triton-cpu.
+* Use self-compiled decord.
+* Change device from cuda to mps.
+
+For decord, I used https://github.com/htvinh/decord/tree/modern-support,
+compiled with:
+
+```bash
+git clone --recursive https://github.com/htvinh/decord.git
+cd decord
+git checkout modern-support
+mkdir build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make -j$(sysctl -n hw.ncpu)
+```
+
+And change this line in ```pyproject.toml``` to compiled repo ```"decord @ file:////Volumes/RC20/repos/decord/python"```.
+
+## Original Readme
+
 <div align="center">
 
 # 🎯 LocateAnything: Fast and High-Quality Vision-Language Grounding with Parallel Box Decoding
